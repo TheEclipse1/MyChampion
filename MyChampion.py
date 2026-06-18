@@ -3,10 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-
-# -------------------------
 # DATA
-# -------------------------
 @st.cache_data
 def load_data():
     return pd.read_csv("lol_champion_dataset.csv")
@@ -14,10 +11,8 @@ def load_data():
 
 df_raw = load_data()
 
-
-# -------------------------
 # FEATURES
-# -------------------------
+
 NUMERIC_FEATURES = [
     "attackdamage", "attackdamageperlevel", "attackspeed", "attackspeedperlevel",
     "crit", "critperlevel", "armor", "armorperlevel", "spellblock", "spellblockperlevel",
@@ -52,9 +47,9 @@ FEATURE_LABELS = {
 CAT_FEATURES = ["primary_role", "resource_type"]
 
 
-# -------------------------
+
 # POSITION MAP (single dropdown)
-# -------------------------
+
 position_map = {
     "Bottom": 0,
     "Jungle": 1,
@@ -64,9 +59,9 @@ position_map = {
 }
 
 
-# -------------------------
+
 # MODEL PREP
-# -------------------------
+
 model_df = df_raw[
     ["champion_name", "positions"] + NUMERIC_FEATURES + CAT_FEATURES
 ].copy()
@@ -90,10 +85,7 @@ X = model_df[ALL_FEAT].values
 champion_names = model_df["champion_name"].values
 champion_positions = model_df["positions"].values
 
-
-# -------------------------
 # RECOMMENDER
-# -------------------------
 def recommend_champions(user_numeric, user_position, user_categorical,
                         user_ranged,
                         ignore_numeric, ignore_position,
@@ -150,19 +142,14 @@ def recommend_champions(user_numeric, user_position, user_categorical,
         (champion_names[i], champion_positions[i])
         for i in top_idx
     ]
-
-
-# -------------------------
 # UI
-# -------------------------
 st.set_page_config(page_title="MyChampion", layout="wide")
 st.header("MyChampion",text_alignment="center")    
 st.sidebar.header("Preferences",text_alignment="center")
 
 
-# -------------------------
-# NUMERIC (SIDE IGNORE FIX)
-# -------------------------
+
+# NUMERIC 
 st.sidebar.subheader("Numeric Stats")
 
 user_numeric = []
@@ -199,11 +186,7 @@ for feat in NUMERIC_FEATURES:
 
     user_numeric.append(val)
     ignore_numeric.append(ignore)
-
-
-# -------------------------
 # POSITION
-# -------------------------
 st.sidebar.subheader("Position")
 
 position_choice = st.sidebar.selectbox(
@@ -215,10 +198,7 @@ position_choice = st.sidebar.selectbox(
 ignore_position = (position_choice == "All")
 user_position = 0 if ignore_position else position_map[position_choice]
 
-
-# -------------------------
 # CATEGORICAL
-# -------------------------
 st.sidebar.subheader("Categorical Stats")
 
 user_categorical = {}
@@ -245,11 +225,8 @@ for feat in CAT_FEATURES:
 
     user_categorical[feat] = val
     ignore_categorical.append(ignore)
-
-
-# -------------------------
-# RANGED / MELEE
-# -------------------------
+    
+# RANGED OR MELEE
 st.sidebar.subheader("Attack Type")
 ignore_ranged=[]
 
@@ -260,11 +237,8 @@ ranged_choice = st.sidebar.selectbox(
 )
 
 user_ranged = 1 if ranged_choice == "Ranged" else 0
-
-
-# -------------------------
 # RUN
-# -------------------------
+
 if st.sidebar.button("Get Recommendations", type="primary"):
     with st.spinner("Finding champions..."):
         recommendations = recommend_champions(
@@ -278,7 +252,6 @@ if st.sidebar.button("Get Recommendations", type="primary"):
             ignore_ranged,
             top_n=10
         )
-
     st.success("Top 10 Champions")
 
     df = pd.DataFrame(recommendations,
