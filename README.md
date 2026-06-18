@@ -6,25 +6,23 @@ MyChampion is a Streamlit-based web application designed to help players find th
 
 ## Features
 
-- Recommend champions based on numeric stats such as attack damage, attack speed, armor, and more
+- Recommend champions based on numeric stats such as attack damage, attack speed, armor, etc
 - Filter recommendations by role/position (Top, Jungle, Mid, ADC, Support)
 - Support for categorical attributes such as resource type and primary role
 - Option to ignore specific attributes to broaden or narrow recommendations
-- Ranged and melee selection support
-- Clean, interactive Streamlit interface
+- Ranged and melee selection 
+- Clean Streamlit interface
 
 ## How It Works
 
-1. Loads and preprocesses champion data
+1. Loads and processes champion data
 2. Encodes categorical features using label encoding
 3. Normalizes numeric features using standard scaling
 4. Builds a user preference vector
 5. Computes weighted distance between user preferences and champions
 6. Returns the closest matching champions
 
-## Tech Stack
-
-- Python
+##Packages
 - Streamlit
 - Pandas
 - NumPy
@@ -32,7 +30,7 @@ MyChampion is a Streamlit-based web application designed to help players find th
 
 ## Project Structure
 
-- MyChampion.py: Main application
+- MyChampion.py: Main app
 - lol_champion_dataset.csv: Dataset file
 
 ## Installation
@@ -43,14 +41,4 @@ Run:
 
 streamlit run MyChampion.py
 
-## Notes
 
-This project is based on similarity matching and does not represent in-game meta rankings.
-"""
-
-output_path = "/mnt/data/README.md"
-
-# using pypandoc convert_text
-convert_text(readme, 'md', format='md', outputfile=output_path, extra_args=['--standalone'])
-
-output_path
