@@ -1,6 +1,4 @@
-from pypandoc import convert_text
 
-readme = """# MyChampion
 
 ## Overview
 
