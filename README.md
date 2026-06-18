@@ -2,7 +2,7 @@
 
 ## Overview
 
-MyChampion is a Streamlit-based web application designed to help players find their next League of Legends champion based on customizable preferences. The tool uses champion statistics and user-selected filters to generate personalized champion recommendations.
+MyChampion is a Streamlit website designed to help players find their next LOL champion based on their preferences. The tool uses champion stats and user selected filters to generate personalized champion recommendations.
 
 ## Features
 
