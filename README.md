@@ -22,7 +22,7 @@ MyChampion is a Streamlit-based web application designed to help players find th
 5. Computes weighted distance between user preferences and champions
 6. Returns the closest matching champions
 
-##Packages
+## Packages
 - Streamlit
 - Pandas
 - NumPy
