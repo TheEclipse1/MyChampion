@@ -1,44 +1,31 @@
-
+# MyChampon
+# A Streamlit made website to help people find their next LOL Champion
 
 ## Overview
+My Champion uses numerical champion data such as attack damage, armor,
+and magic resistance, as well as categorical champion data,
+such as the champion's most popular position or their fighter type
+to help you find a new champion to play based on your play style
 
-MyChampion is a Streamlit website designed to help players find their next LOL champion based on their preferences. The tool uses champion stats and user selected filters to generate personalized champion recommendations.
+## How to Use this App
+Go to https://mychampion.streamlit.app
+Input all the different data based on your playstyle
+(If there's a metric that you don't really care about, 
+you can check the ignore box to ignore that metric)
 
-## Features
-
-- Recommend champions based on numeric stats such as attack damage, attack speed, armor, etc
-- Filter recommendations by role/position (Top, Jungle, Mid, ADC, Support)
-- Support for categorical attributes such as resource type and primary role
-- Option to ignore specific attributes to broaden or narrow recommendations
-- Ranged and melee selection 
-- Clean Streamlit interface
-
-## How It Works
-
-1. Loads and processes champion data
-2. Encodes categorical features using label encoding
-3. Normalizes numeric features using standard scaling
-4. Builds a user preference vector
-5. Computes weighted distance between user preferences and champions
-6. Returns the closest matching champions
-
-## Packages
-- Streamlit
-- Pandas
-- NumPy
-- Scikit-learn
-
-## Project Structure
-
-- MyChampion.py: Main app
-- lol_champion_dataset.csv: Dataset file
-
-## Installation
-
-pip install streamlit pandas numpy scikit-learn
-
-Run:
-
+## Tweaking
+# If you want to make something like this for a different game
+1. Download the zip file
+2.  extract the contents
+3.  open your IDE
+4.  run
+  ```bash
+pip install -r requirements.txt
+```
+5. Open the code and tweak the Categorical and Numerical Features to what matches your dataset
+6. If you want custom labels on your website that differ from the dataset columns, just add the column name: your name to the featured labels dictionary.
+7. To build run
+```bash
 streamlit run MyChampion.py
-
-
+```
+and you should have your own website
