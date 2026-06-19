@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-# DATA
+
+
 @st.cache_data
 def load_data():
     return pd.read_csv("lol_champion_dataset.csv")
@@ -11,7 +12,8 @@ def load_data():
 
 df_raw = load_data()
 
-# FEATURES
+
+
 
 NUMERIC_FEATURES = [
     "attackdamage", "attackdamageperlevel", "attackspeed", "attackspeedperlevel",
@@ -20,6 +22,8 @@ NUMERIC_FEATURES = [
     "mpregen", "mpregenperlevel", "mp", "mpperlevel", "attackrange",
     "info_attack", "info_defense", "info_magic", "info_difficulty"
 ]
+
+
 
 FEATURE_LABELS = {
     "attackdamage": "Attack Damage",
@@ -44,11 +48,11 @@ FEATURE_LABELS = {
     'mpperlevel':'Magic Power Per Level'
 }
 
+
 CAT_FEATURES = ["primary_role", "resource_type"]
 
 
 
-# POSITION MAP (single dropdown)
 
 position_map = {
     "Bottom": 0,
@@ -60,44 +64,53 @@ position_map = {
 
 
 
-# MODEL PREP
 
 model_df = df_raw[
     ["champion_name", "positions"] + NUMERIC_FEATURES + CAT_FEATURES
 ].copy()
 
-label_encoders = {}
 
+label_encoders = {}
 for col in CAT_FEATURES:
     le = LabelEncoder()
     model_df[col] = le.fit_transform(model_df[col].astype(str))
     label_encoders[col] = le
 
+
 model_df["position"] = df_raw["positions"].map(position_map)
 model_df["is_ranged"] = df_raw["is_ranged"].astype(int)
+
+
 
 scaler = StandardScaler()
 model_df[NUMERIC_FEATURES] = scaler.fit_transform(model_df[NUMERIC_FEATURES])
 
+
 ALL_FEAT = NUMERIC_FEATURES + ["position"] + CAT_FEATURES + ["is_ranged"]
+
 
 X = model_df[ALL_FEAT].values
 champion_names = model_df["champion_name"].values
 champion_positions = model_df["positions"].values
 
-# RECOMMENDER
+
+
+
 def recommend_champions(user_numeric, user_position, user_categorical,
                         user_ranged,
                         ignore_numeric, ignore_position,
                         ignore_categorical, ignore_ranged,
                         top_n=10):
 
+
     user_num_scaled = scaler.transform([user_numeric])[0]
+
 
     user_cat_encoded = []
     for col in CAT_FEATURES:
         raw_val = user_categorical[col]
         le = label_encoders[col]
+
 
         if raw_val == "All":
             encoded = 0
@@ -108,6 +121,7 @@ def recommend_champions(user_numeric, user_position, user_categorical,
 
         user_cat_encoded.append(encoded)
 
+
     user_vec = np.concatenate([
         user_num_scaled,
         np.array([user_position], dtype=float),
@@ -115,58 +129,78 @@ def recommend_champions(user_numeric, user_position, user_categorical,
         np.array([user_ranged], dtype=float)
     ])
 
+
     weights = np.ones(len(ALL_FEAT))
 
-    # numeric weights
+
     weights[:len(NUMERIC_FEATURES)] = [0 if x else 1 for x in ignore_numeric]
 
-    # position weight
+
     pos_idx = len(NUMERIC_FEATURES)
     weights[pos_idx] = 0 if ignore_position else 1
 
-    # categorical weights
+
     cat_start = len(NUMERIC_FEATURES) + 1
     weights[cat_start:cat_start + len(CAT_FEATURES)] = [
         0 if x else 1 for x in ignore_categorical
     ]
 
-    # ranged weight
+
     weights[-1] = 0 if ignore_ranged else 1
+
+
 
     diff = X - user_vec
     distances = np.sqrt((weights * diff ** 2).sum(axis=1))
 
+
     top_idx = np.argsort(distances)[:top_n]
+
 
     return [
         (champion_names[i], champion_positions[i])
         for i in top_idx
     ]
-# UI
+
+
+
 st.set_page_config(page_title="MyChampion", layout="wide")
-st.header("MyChampion",text_alignment="center")    
-st.sidebar.header("Preferences",text_alignment="center")
+st.markdown(
+    """<style>
+    [data-testid="stSidebar"] {
+        width: 350px !important;
+    }
+    [data-testid="stSidebarCollapseButton"] {
+        display: none !important;
+    }</style>""",
+    unsafe_allow_html=True
+)
+st.header("MyChampion", text_alignment="center")
+st.sidebar.header("Preferences", text_alignment="center")
 
 
 
-# NUMERIC 
 st.sidebar.subheader("Numeric Stats")
 
 user_numeric = []
 ignore_numeric = []
 
+
 for feat in NUMERIC_FEATURES:
     min_val = float(df_raw[feat].min())
     max_val = float(df_raw[feat].max())
+
 
     if min_val == max_val:
         user_numeric.append(min_val)
         ignore_numeric.append(True)
         continue
 
+
     step = max((max_val - min_val) / 50.0, 1e-6)
 
-    col1, col2 = st.sidebar.columns([4, 1])
+
+    col1, col2 = st.sidebar.columns([3, 2])
 
     with col1:
         val = st.slider(
@@ -186,7 +220,9 @@ for feat in NUMERIC_FEATURES:
 
     user_numeric.append(val)
     ignore_numeric.append(ignore)
-# POSITION
+
+
+
 st.sidebar.subheader("Position")
 
 position_choice = st.sidebar.selectbox(
@@ -195,19 +231,22 @@ position_choice = st.sidebar.selectbox(
     index=0
 )
 
+
 ignore_position = (position_choice == "All")
 user_position = 0 if ignore_position else position_map[position_choice]
 
-# CATEGORICAL
+
+
 st.sidebar.subheader("Categorical Stats")
 
 user_categorical = {}
 ignore_categorical = []
 
+
 for feat in CAT_FEATURES:
     options = list(label_encoders[feat].classes_) + ["All"]
 
-    col1, col2 = st.sidebar.columns([4, 1])
+    col1, col2 = st.sidebar.columns([3, 2])
 
     with col1:
         val = st.sidebar.selectbox(
@@ -225,10 +264,11 @@ for feat in CAT_FEATURES:
 
     user_categorical[feat] = val
     ignore_categorical.append(ignore)
-    
-# RANGED OR MELEE
+
+
+
 st.sidebar.subheader("Attack Type")
-ignore_ranged=[]
+ignore_ranged = []
 
 ranged_choice = st.sidebar.selectbox(
     "Type",
@@ -236,8 +276,10 @@ ranged_choice = st.sidebar.selectbox(
     index=0
 )
 
+
 user_ranged = 1 if ranged_choice == "Ranged" else 0
-# RUN
+
+
 
 if st.sidebar.button("Get Recommendations", type="primary"):
     with st.spinner("Finding champions..."):
@@ -252,14 +294,18 @@ if st.sidebar.button("Get Recommendations", type="primary"):
             ignore_ranged,
             top_n=10
         )
+
     st.success("Top 10 Champions")
+
 
     df = pd.DataFrame(recommendations,
                    columns=["Champion", "Positions"])
+
 
     df.insert(0, "Rank", range(1, len(df) + 1))
 
     st.dataframe(df, use_container_width=True)
 
 else:
-    st.info("Adjust settings and click Get Recommendations.")
+    st.info("Slide the bars based on your playstyle and find a new Champion to play!")
+
